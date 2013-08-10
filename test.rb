@@ -21,3 +21,16 @@ puts site
 site = JSON.parse(ox3.get('/a/site/12345'))
 puts site
 puts site['name']
+
+
+##################
+#  OpenX API v1
+##################
+ox3v1 = OX3APIClient.new(email, password, site_url, consumer_key, consumer_secret, realm, 'v1')
+puts ox3v1.get('/a/account')
+
+##################
+#  OpenX API v2
+##################
+ox3v2 = OX3APIClient.new(email, password, site_url, consumer_key, consumer_secret, realm, 'v2')
+puts JSON.parse(ox3v2.get('/account'))['objects']
