@@ -7,6 +7,7 @@ class OX3APIClient < OAuth::Consumer
     version='v2', sso_domain='sso.openx.com', callback='oob', scheme='https', debug=false)
     
     @version, @callback, @site, @debug = version, callback, site_url, debug
+    @site = @site.end_with?('/') ? @site.chop : @site
     
     super(consumer_key, consumer_secret, {
       :http_method => :post,
