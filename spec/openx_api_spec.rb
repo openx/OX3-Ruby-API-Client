@@ -5,7 +5,5 @@ describe OpenxApi do
     expect(OpenxApi::VERSION).not_to be nil
   end
 
-  it 'does something useful' do
-    expect(false).to eq(true)
-  end
+  pending 'The tests do something useful'
 end
