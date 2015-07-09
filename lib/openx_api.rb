@@ -2,13 +2,13 @@ require 'oauth'
 require 'yaml'
 
 class OX3APIClient < OAuth::Consumer
-  
-  def initialize(email, password, site_url, consumer_key, consumer_secret, realm, 
+
+  def initialize(email, password, site_url, consumer_key, consumer_secret, realm,
     version='v2', sso_domain='sso.openx.com', callback='oob', scheme='https', debug=false)
-    
+
     @version, @callback, @site, @debug = version, callback, site_url, debug
     @site = @site.end_with?('/') ? @site.chop : @site
-    
+
     super(consumer_key, consumer_secret, {
       :http_method => :post,
       :scheme => :header,
@@ -20,16 +20,16 @@ class OX3APIClient < OAuth::Consumer
       :authorize_path => scheme + '://' + sso_domain + '/login/process',
       :realm => realm
     })
-    
+
     # Step 1. Fetch temporary request token.
     fetch_request_token
-    
+
     # Step 2. Log in to SSO server and authorize token.
     authorize_token(email, password)
-    
+
     # Step 3. Swap temporary request token for permanent access token.
     fetch_access_token
-    
+
     # Step 4. Validate your access token.
     validate_session
   end
@@ -50,34 +50,34 @@ class OX3APIClient < OAuth::Consumer
   def get(path)
     perform_request do |prefix, params|
       self.create_http_request(
-        :get, 
-        prefix + path, 
+        :get,
+        prefix + path,
         params
       )
     end
   end
-  
+
   def post(path, body = {})
     perform_request do |prefix, params|
       self.create_http_request(
-        :post, 
+        :post,
         prefix + path,
         body,
         params
       )
     end
   end
-  
+
   def delete(path)
     perform_request do |prefix, params|
       self.create_http_request(
-        :delete, 
-        prefix + path, 
+        :delete,
+        prefix + path,
         params
       )
     end
   end
-  
+
   def logoff
     delete "/a/session"
   end
@@ -86,16 +86,16 @@ class OX3APIClient < OAuth::Consumer
 private
   def fetch_request_token
     @request_token = self.get_request_token(
-      {:oauth_callback => @callback}, 
+      {:oauth_callback => @callback},
       {'Content-Type' => 'application/x-www-form-urlencoded'}
     )
     if @debug
       puts YAML::dump(@request_token)
     end
   end
-  
+
   def authorize_token(email, password)
-    authorize = self.request(:post,  self.authorize_path, nil, 
+    authorize = self.request(:post,  self.authorize_path, nil,
       {:oauth_token => @request_token.token, :oauth_callback => @callback},
       {:email => email, :password => password, :oauth_token => @request_token.token},
       {'Content-Type' => 'application/x-www-form-urlencoded'}
@@ -103,8 +103,8 @@ private
     if authorize.code.to_s == '200'
       response = authorize
     else
-      response = self.request(:post, authorize.header['Location'], nil, 
-        {:oauth_token => @request_token.token, :oauth_callback => @callback}, nil, 
+      response = self.request(:post, authorize.header['Location'], nil,
+        {:oauth_token => @request_token.token, :oauth_callback => @callback}, nil,
         {
           'Content-Type' => 'application/x-www-form-urlencoded',
           'Cookie' => authorize.get_fields('set-cookie')[0],
@@ -116,7 +116,7 @@ private
     end
     @oauth_verifier = parse_tokens(response.body)[:oauth_verifier]
   end
-  
+
   def fetch_access_token
     @acccess_token = @request_token.get_access_token(
       {:oauth_verifier => @oauth_verifier, :oauth_token => @request_token.token, :oauth_callback => @callback},
@@ -126,7 +126,7 @@ private
       puts YAML::dump(@acccess_token)
     end
   end
-  
+
   def validate_session
 =begin
     path = @version == 'v1' ? "/ox/3.0/a/session/validate" : "/ox/4.0/session"
@@ -140,7 +140,7 @@ private
 =end
     response = perform_request do |prefix, params|
       self.create_http_request(
-        @version == 'v1' ? :put : :get, 
+        @version == 'v1' ? :put : :get,
         prefix + (@version == 'v1' ? "/a/session/validate" : "/session"),
         nil,
         params
@@ -150,16 +150,16 @@ private
       puts YAML::dump(response)
     end
   end
-  
+
   def parse_tokens(keys)
     keys.split("&").inject({}) do |hash, pair|
       key, value = pair.split("=")
       hash.merge({ key.to_sym => CGI.unescape(value) })
     end
   end
-  
+
   def get_domain
     URI.parse(@site).host
   end
-  
+
 end
