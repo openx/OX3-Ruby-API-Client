@@ -40,7 +40,7 @@ class OX3APIClient < OAuth::Consumer
     http.open_timeout =  5 * 60
     http.read_timeout = 15 * 60
     params = Hash.new
-    params['Content-Type'] = 'application/x-www-form-urlencoded'
+    params['Content-Type'] = 'application/json'
     params['Cookie'] = 'openx3_access_token=' + @acccess_token.token + '; domain=' + get_domain + '; path=/'
     prefix = @version == 'v1' ? "/ox/3.0" : "/ox/4.0"
     response = http.request yield prefix, params
