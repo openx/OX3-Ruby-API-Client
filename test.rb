@@ -12,25 +12,26 @@ realm = ''
 site_url = ''
 
 ox3 = OX3APIClient.new(email, password, site_url, consumer_key, consumer_secret, realm)
-puts ox3.get('/a/site')
+puts ox3.get('/site')
 
-site = ox3.post('/a/site/12345',
-  {'id' => 12345, 'name' => 'SiteName', 'url' => 'http://www.sample.com', 'status' => 'Active'}
+# Create site
+site = ox3.post('/site',
+  {'name' => "SiteName ##{Random.rand(1000)}",
+   'url' => 'http://www.sample.com',
+   'account_uid' => '60000028-accf-fff1-8123-0c9a66', # uid of your publisher account
+   'status' => 'Active'}
 )
 puts site
-site = JSON.parse(ox3.get('/a/site/12345'))
+
+# Update site
+site_uid = '20000001-e000-fff1-8123-0c9a66'
+site = ox3.put("/site/#{site_uid}",
+  {'name' => "Updated Name for Site #{site_uid}", 'url' => 'http://www.sample.com'}
+)
 puts site
-puts site['name']
 
+# Check that the site's name was updated
+site = JSON.parse(ox3.get("/site/#{site_uid}"))
+puts site
+puts site[0]['name']
 
-##################
-#  OpenX API v1
-##################
-ox3v1 = OX3APIClient.new(email, password, site_url, consumer_key, consumer_secret, realm, 'v1')
-puts ox3v1.get('/a/account')
-
-##################
-#  OpenX API v2
-##################
-ox3v2 = OX3APIClient.new(email, password, site_url, consumer_key, consumer_secret, realm, 'v2')
-puts JSON.parse(ox3v2.get('/account'))['objects']
