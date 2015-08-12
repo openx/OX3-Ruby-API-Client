@@ -42,7 +42,7 @@ class OX3APIClient < OAuth::Consumer
     params = Hash.new
     params['Content-Type'] = 'application/json'
     params['Cookie'] = 'openx3_access_token=' + @acccess_token.token + '; domain=' + get_domain + '; path=/'
-    prefix = @version == 'v1' ? "/ox/3.0" : "/ox/4.0"
+    prefix = "/ox/4.0"
     response = http.request yield prefix, params
     response.body
   end
@@ -58,9 +58,26 @@ class OX3APIClient < OAuth::Consumer
   end
   
   def post(path, body = {})
+    if body.is_a?(Hash)
+      body = JSON.dump(body)
+    end
     perform_request do |prefix, params|
       self.create_http_request(
         :post, 
+        prefix + path,
+        body,
+        params
+      )
+    end
+  end
+  
+  def put(path, body = {})
+    if body.is_a?(Hash)
+      body = JSON.dump(body)
+    end
+    perform_request do |prefix, params|
+      self.create_http_request(
+        :put, 
         prefix + path,
         body,
         params
@@ -79,7 +96,7 @@ class OX3APIClient < OAuth::Consumer
   end
   
   def logoff
-    delete "/a/session"
+    get "/login/logout"
   end
 ################################################################################################################
 
@@ -129,19 +146,19 @@ private
   
   def validate_session
 =begin
-    path = @version == 'v1' ? "/ox/3.0/a/session/validate" : "/ox/4.0/session"
-    method = @version == 'v1' ? :put : :get
+    path = "/ox/4.0/session"
+    method = :get
     response = self.request(method.to_sym, @site + path, nil, {}, nil,
       {
-        'Content-Type' => 'application/x-www-form-urlencoded',
+        'Content-Type' => 'application/json',
         'Cookie' => 'openx3_access_token=' + @acccess_token.token + '; domain=' + get_domain + '; path=/'
       }
     )
 =end
     response = perform_request do |prefix, params|
       self.create_http_request(
-        @version == 'v1' ? :put : :get, 
-        prefix + (@version == 'v1' ? "/a/session/validate" : "/session"),
+        :get, 
+        prefix + "/session",
         nil,
         params
       )
