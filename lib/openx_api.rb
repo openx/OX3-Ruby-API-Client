@@ -5,7 +5,7 @@ require 'yaml'
 
 module OpenxApi
 
-  class OX3APIClient < OAuth::Consumer
+  class OX3APIClient < ::OAuth::Consumer
   
     def initialize(email, password, site_url, consumer_key, consumer_secret, realm, 
       version='v2', sso_domain='sso.openx.com', callback='oob', scheme='https', debug=false)
