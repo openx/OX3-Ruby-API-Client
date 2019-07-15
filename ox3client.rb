@@ -35,6 +35,10 @@ class OX3APIClient < OAuth::Consumer
   end
 
 ################################################################################################################
+  def get_access_token
+    @acccess_token.token
+  end
+
   def perform_request
     http = self.create_http(@site)
     http.open_timeout =  5 * 60
