@@ -60,6 +60,16 @@ class OX3APIClient < OAuth::Consumer
       )
     end
   end
+
+  def report_get(path)
+    perform_request do |prefix, params|
+      self.create_http_request(
+        :get, 
+        path, 
+        params
+      )
+    end
+  end
   
   def post(path, body = {})
     if body.is_a?(Hash)
@@ -69,6 +79,20 @@ class OX3APIClient < OAuth::Consumer
       self.create_http_request(
         :post, 
         prefix + path,
+        body,
+        params
+      )
+    end
+  end
+
+  def report_post(path, body = {})
+    if body.is_a?(Hash)
+      body = JSON.dump(body)
+    end
+    perform_request do |prefix, params|
+      self.create_http_request(
+        :post, 
+        path,
         body,
         params
       )
