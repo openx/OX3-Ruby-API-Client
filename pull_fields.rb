@@ -2,13 +2,14 @@ require 'rubygems'
 require 'json'
 require 'oauth'
 require_relative 'ox3client.rb'
+require_relative 'my_config'
 
-email = 'email@domain.com'
-password = 'password'
-consumer_key = '123qwer123qwe123qwe123qwe123qwe'
-consumer_secret = '456zxc567cxz567xzc567zxc567czx'
-realm = 'ui_realm'
-site_url = 'ui_domain'
+email = $cfg_email
+password = $cfg_password
+consumer_key = $cfg_consumer_key
+consumer_secret = $cfg_consumer_secret
+realm = $cfg_realm
+site_url = $cfg_domain
 
 ox3 = OX3APIClient.new(email, password, site_url, consumer_key, consumer_secret, realm)
 
