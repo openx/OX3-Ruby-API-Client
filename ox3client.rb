@@ -47,7 +47,7 @@ class OX3APIClient < OAuth::Consumer
     params['Content-Type'] = 'application/json'
     params['Cookie'] = 'openx3_access_token=' + @acccess_token.token 
 #+ '; domain=' + get_domain + '; path=/'
-    prefix = "/ox/4.0"
+    prefix = "/data/1.0"
     response = http.request yield prefix, params
     response.body
   end
